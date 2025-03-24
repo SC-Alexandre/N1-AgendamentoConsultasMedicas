@@ -23,7 +23,7 @@ public class ConsultaService {
     public void agendarConsulta(Consulta consulta) {
         validarDadosConsulta(consulta);
 
-        if (consultaRepository.existsByPacienteAndDataAndHorario(consulta.getPaciente(), consulta.getDataConsulta(), consulta.getHorarioConsulta())) {
+        if (consultaRepository.existsByPacienteAndDataConsultaAndHorarioConsulta(consulta.getPaciente(), consulta.getDataConsulta(), consulta.getHorarioConsulta())) {
             throw new ConsultaException("O paciente já tem uma consulta agendada para esse horário!");
         }
 
