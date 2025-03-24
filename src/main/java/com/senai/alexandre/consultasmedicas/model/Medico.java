@@ -17,7 +17,7 @@ public class Medico {
     @Column(name = "especialidade",nullable = false, length = 50)
     private String especialidade;
 
-    @Column(name =  "crm", nullable = false, length = 9) //8 sem o -
+    @Column(name =  "crm", nullable = false, length = 9)
     private String crm;
 
     @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

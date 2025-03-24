@@ -24,7 +24,7 @@ public class PacienteController {
     }
 
     @PutMapping
-    public Paciente updateMedico(@RequestBody Paciente paciente) {
+    public Paciente updatePaciente(@RequestBody Paciente paciente) {
         return pacienteService.update(paciente);
     }
 

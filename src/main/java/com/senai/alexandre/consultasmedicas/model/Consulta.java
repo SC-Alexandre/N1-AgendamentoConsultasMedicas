@@ -13,12 +13,12 @@ public class Consulta {
     private Integer id;
 
     @Column
-    private LocalDate dataConsulta;
+    private LocalDate dataConsulta; // yyyy-MM-dd
 
     @Column
-    private LocalTime horarioConsulta;
+    private LocalTime horarioConsulta; // HH:mm:ss
 
-    @Enumerated(EnumType.STRING) // Armazena como string no banco de dados
+    @Enumerated(EnumType.STRING) // Armazenar como string no banco de dados
     private StatusConsulta status;
 
     @ManyToOne

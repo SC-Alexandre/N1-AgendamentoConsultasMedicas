@@ -1,5 +1,6 @@
 package com.senai.alexandre.consultasmedicas.service;
 
+import com.senai.alexandre.consultasmedicas.exception.ConsultaException;
 import com.senai.alexandre.consultasmedicas.model.Consulta;
 import com.senai.alexandre.consultasmedicas.model.StatusConsulta;
 import com.senai.alexandre.consultasmedicas.repository.ConsultaRepository;
@@ -16,41 +17,64 @@ public class ConsultaService {
     private ConsultaRepository consultaRepository;
 
     public Consulta findById(int id) {
-        return consultaRepository.findById(id).orElse(null);
+        return consultaRepository.findById(id).orElseThrow(() -> new ConsultaException("Consulta não encontrada com ID: " + id));
     }
 
     public void agendarConsulta(Consulta consulta) {
+        validarDadosConsulta(consulta);
+
         if (consultaRepository.existsByPacienteAndDataAndHorario(consulta.getPaciente(), consulta.getDataConsulta(), consulta.getHorarioConsulta())) {
-            throw new RuntimeException("O paciente já tem uma consulta agendada para esse horário!");
+            throw new ConsultaException("O paciente já tem uma consulta agendada para esse horário!");
         }
+
         consulta.setStatus(StatusConsulta.AGENDADA);
         consultaRepository.save(consulta);
     }
 
     public void cancelarConsulta(Integer id) {
-        Consulta consulta = consultaRepository.findById(id).orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        Consulta consulta = consultaRepository.findById(id).orElseThrow(() -> new ConsultaException("Consulta não encontrada"));
 
         if (consulta.getStatus() == StatusConsulta.REALIZADA) {
-            throw new RuntimeException("Não é possível cancelar uma consulta já realizada.");
+            throw new ConsultaException("Não é possível cancelar uma consulta já realizada.");
         }
+
         consulta.setStatus(StatusConsulta.CANCELADA);
         consultaRepository.save(consulta);
     }
 
     public void concluirConsulta(Integer id) {
-        Consulta consulta = consultaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        Consulta consulta = consultaRepository.findById(id).orElseThrow(() -> new ConsultaException("Consulta não encontrada"));
 
         if (consulta.getStatus() == StatusConsulta.CANCELADA) {
-            throw new RuntimeException("Não é possível concluir uma consulta cancelada.");
+            throw new ConsultaException("Não é possível concluir uma consulta cancelada.");
         }
 
         if (consulta.getDataConsulta().isAfter(LocalDate.now()) ||
                 (consulta.getDataConsulta().isEqual(LocalDate.now()) && consulta.getHorarioConsulta().isAfter(LocalTime.now()))) {
-            throw new RuntimeException("Não é possível concluir uma consulta antes do horário.");
+            throw new ConsultaException("Não é possível concluir uma consulta antes do horário.");
         }
 
         consulta.setStatus(StatusConsulta.REALIZADA);
         consultaRepository.save(consulta);
     }
+
+    // Tratamento de Exceções
+    private void validarDadosConsulta(Consulta consulta) {
+        if (consulta.getPaciente() == null) {
+            throw new ConsultaException("O paciente é obrigatório.");
+        }
+
+        if (consulta.getMedico() == null) {
+            throw new ConsultaException("O médico é obrigatório.");
+        }
+
+        if (consulta.getDataConsulta() == null || consulta.getHorarioConsulta() == null) {
+            throw new ConsultaException("A data e o horário da consulta são obrigatórios.");
+        }
+
+        if (consulta.getDataConsulta().isBefore(LocalDate.now())) {
+            throw new ConsultaException("A consulta não pode ser agendada para o passado.");
+        }
+    }
+
 }

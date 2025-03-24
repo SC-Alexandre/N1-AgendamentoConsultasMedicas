@@ -19,7 +19,7 @@ public class Paciente {
     private String cpf;
 
     @Column
-    private LocalDate dataNascimento;
+    private LocalDate dataNascimento; // yyyy-MM-dd
 
     @Column(name = "telefone", nullable = false, length = 11)
     private String telefone;

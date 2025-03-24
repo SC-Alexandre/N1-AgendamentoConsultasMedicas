@@ -26,7 +26,7 @@ public class ConsultaController {
     public void concluirConsulta(@PathVariable Integer id) {
         consultaService.concluirConsulta(id);
     }
-    
+
     @GetMapping("/{id}")
     public Consulta getConsultaById(@PathVariable Integer id) {
         return consultaService.findById(id);
